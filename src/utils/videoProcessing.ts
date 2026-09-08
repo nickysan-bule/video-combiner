@@ -106,7 +106,7 @@ ${caption.text}`
     onProgress('Finalizing...', 90)
     const data = await ffmpeg.readFile('output.mp4')
     
-    let videoBuffer: ArrayBuffer
+    let videoBuffer: ArrayBuffer | SharedArrayBuffer
     if (data instanceof ArrayBuffer) {
       videoBuffer = data
     } else if (data instanceof Uint8Array) {
