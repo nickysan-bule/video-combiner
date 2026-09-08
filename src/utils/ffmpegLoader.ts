@@ -4,7 +4,7 @@ import { toBlobURL } from '@ffmpeg/util'
 let ffmpegInstance: FFmpeg | null = null
 
 export const getFFmpeg = async (): Promise<FFmpeg> => {
-  if (ffmpegInstance && ffmpegInstance.isLoaded()) {
+  if (ffmpegInstance && ffmpegInstance.loaded) {
     return ffmpegInstance
   }
 

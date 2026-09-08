@@ -46,36 +46,11 @@ const buildConcatDemuxer = (clips: VideoClip[]): string => {
   return concat
 }
 
-const buildSubtitleFilter = (style: CaptionStyle, videoDuration: number): string => {
-  const colorRGB = hexToRGB(style.color)
-  const yOffset = getYOffset(style.position)
-  
-  // Create SRT subtitle data
-  const srtContent = `1
-00:00:00,000 --> 00:${String(Math.floor(videoDuration / 60)).padStart(2, '0')}:${String(Math.floor(videoDuration % 60)).padStart(2, '0')},000
-${style.text}`
-  
-  return srtContent
-}
-
 const hexToRGB = (hex: string): string => {
   const r = hex.slice(1, 3)
   const g = hex.slice(3, 5)
   const b = hex.slice(5, 7)
   return `0x${b}${g}${r}`
-}
-
-const getYOffset = (position: 'top' | 'middle' | 'bottom'): number => {
-  switch (position) {
-    case 'top':
-      return 50
-    case 'middle':
-      return 'h/2 - text_h/2'
-    case 'bottom':
-      return 'h - text_h - 50'
-    default:
-      return 'h - text_h - 50'
-  }
 }
 
 export const combineVideosWithCaption = async (
@@ -111,8 +86,10 @@ export const combineVideosWithCaption = async (
     // Step 4: Create subtitle file
     onProgress('Adding captions...', 60)
     const totalDuration = clips.reduce((sum, clip) => sum + clip.duration, 0)
-    const subtitleContent = buildSubtitleFilter(caption, totalDuration)
-    await ffmpeg.writeFile('subtitles.srt', subtitleContent)
+    const srtContent = `1
+00:00:00,000 --> 00:${String(Math.floor(totalDuration / 60)).padStart(2, '0')}:${String(Math.floor(totalDuration % 60)).padStart(2, '0')},000
+${caption.text}`
+    await ffmpeg.writeFile('subtitles.srt', srtContent)
 
     // Step 5: Add captions and encode
     onProgress('Encoding with captions...', 70)
